@@ -62,10 +62,10 @@ def generate_level(level):
 
 
 tile_images = {
-    'wall': pygame.transform.scale(load_image('box.png'), (30, 30)),
+    'wall': None,
     'empty': pygame.transform.scale(load_image('grass.png'), (30, 30))
 }
-player_image = load_image('mario.png')
+player_image = None
 
 tile_width = tile_height = 30
 
@@ -91,7 +91,7 @@ class Player(pygame.sprite.Sprite):
 
 
 class Bomb(pygame.sprite.Sprite):
-    image = pygame.transform.scale(load_image('fon.jpg'), (WIDTH, HEIGHT))
+    image = None
 
     def __init__(self, *group):
         super().__init__(*group)
@@ -103,7 +103,6 @@ class Bomb(pygame.sprite.Sprite):
 end_group = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
-Bomb(end_group)
 
 player, level_x, level_y = generate_level(load_level('map.txt'))
 
@@ -111,9 +110,7 @@ clock = pygame.time.Clock()
 running = True
 
 while running:
-    all_sprites.draw(screen)
     tiles_group.draw(screen)
-    player_group.draw(screen)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False

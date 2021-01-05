@@ -58,18 +58,34 @@ def generate_level(level):
             elif level[y][x] == '@':
                 Tile('empty', x, y)
                 new_player = Player(x, y)
+            elif level[y][x] == '%':
+                Tile('bigtown', x, y)
+            elif level[y][x] == '$':
+                Tile('coin', x, y)
             elif level[y][x] == '+':
                 Tile('road', x, y)
             elif level[y][x] == '-':
                 Tile('groad', x, y)
             elif level[y][x] == '[':
                 Tile('lbroad', x, y)
+            elif level[y][x] == 'T':
+                Tile('troad', x, y)
+            elif level[y][x] == 'r':
+                Tile('rtroad', x, y)
+            elif level[y][x] == 'e':
+                Tile('retroad', x, y)
             elif level[y][x] == ']':
                 Tile('rbroad', x, y)
             elif level[y][x] == 'o':
                 Tile('luroad', x, y)
             elif level[y][x] == 'p':
                 Tile('ruroad', x, y)
+            elif level[y][x] == 'c':
+                Tile('croad', x, y)
+            elif level[y][x] == 'u':
+                Tile('ltroad', x, y)
+
+
             elif level[y][x] == 't':
                 Tile('tree', x, y)
             elif level[y][x] == '8':
@@ -86,6 +102,14 @@ def generate_level(level):
                 Tile('lbriver', x, y)
             elif level[y][x] == 'b':
                 Tile('griverb', x, y)
+            elif level[y][x] == 'd':
+                Tile('riverb', x, y)
+            elif level[y][x] == 'n':
+                Tile('smalltown', x, y)
+            elif level[y][x] == 'x':
+                Tile('smalltowna', x, y)
+            elif level[y][x] == 'y':
+                Tile('smalltownb', x, y)
     return new_player, x, y
 
 
@@ -99,6 +123,11 @@ tile_images = {
     'ruroad': pygame.transform.scale(load_image('ruroad.png'), (30, 30)),
     'tree': pygame.transform.scale(load_image('tgrass.png'), (30, 30)),
     'groad': pygame.transform.scale(load_image('groad.png'), (30, 30)),
+    'troad': pygame.transform.scale(load_image('troad.png'), (30, 30)),
+    'rtroad': pygame.transform.scale(load_image('rtroad.png'), (30, 30)),
+    'retroad': pygame.transform.scale(load_image('retroad.png'), (30, 30)),
+    'croad': pygame.transform.scale(load_image('croad.png'), (30, 30)),
+    'ltroad': pygame.transform.scale(load_image('ltroad.png'), (30, 30)),
 
     'griver': pygame.transform.scale(load_image('griver.png'), (30, 30)),
     'river': pygame.transform.scale(load_image('river.png'), (30, 30)),
@@ -106,7 +135,15 @@ tile_images = {
     'rbriver': pygame.transform.scale(load_image('rbriver.png'), (30, 30)),
     'luriver': pygame.transform.scale(load_image('luriver.png'), (30, 30)),
     'ruriver': pygame.transform.scale(load_image('ruriver.png'), (30, 30)),
-    'griverb': pygame.transform.scale(load_image('griverb.png'), (30, 30))
+    'griverb': pygame.transform.scale(load_image('griverb.png'), (30, 30)),
+    'riverb': pygame.transform.scale(load_image('riverb.png'), (30, 30)),
+    'smalltown': pygame.transform.scale(load_image('smalltown.png'), (30, 30)),
+    'smalltowna': pygame.transform.scale(load_image('smalltowna.png'), (30, 30)),
+    'smalltownb': pygame.transform.scale(load_image('smalltownb.png'), (30, 30)),
+    'bigtown': pygame.transform.scale(load_image('castle.png'), (30, 30)),
+    'coin': pygame.transform.scale(load_image('coin.png'), (30, 30)),
+    'coina': pygame.transform.scale(load_image('coina.png'), (30, 30)),
+    'coinb': pygame.transform.scale(load_image('coinb.png'), (30, 30)),
 }
 player_image = None
 

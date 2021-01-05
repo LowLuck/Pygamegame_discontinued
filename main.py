@@ -8,7 +8,7 @@ pygame.init()
 size = WIDTH, HEIGHT
 screen = pygame.display.set_mode(size)
 all_sprites = pygame.sprite.Group()
-
+pygame.display.set_caption('P2C1 WIP')
 fps = 50
 
 walls = []
@@ -58,12 +58,55 @@ def generate_level(level):
             elif level[y][x] == '@':
                 Tile('empty', x, y)
                 new_player = Player(x, y)
+            elif level[y][x] == '+':
+                Tile('road', x, y)
+            elif level[y][x] == '-':
+                Tile('groad', x, y)
+            elif level[y][x] == '[':
+                Tile('lbroad', x, y)
+            elif level[y][x] == ']':
+                Tile('rbroad', x, y)
+            elif level[y][x] == 'o':
+                Tile('luroad', x, y)
+            elif level[y][x] == 'p':
+                Tile('ruroad', x, y)
+            elif level[y][x] == 't':
+                Tile('tree', x, y)
+            elif level[y][x] == '8':
+                Tile('river', x, y)
+            elif level[y][x] == '6':
+                Tile('griver', x, y)
+            elif level[y][x] == '3':
+                Tile('rbriver', x, y)
+            elif level[y][x] == '7':
+                Tile('luriver', x, y)
+            elif level[y][x] == '9':
+                Tile('ruriver', x, y)
+            elif level[y][x] == '1':
+                Tile('lbriver', x, y)
+            elif level[y][x] == 'b':
+                Tile('griverb', x, y)
     return new_player, x, y
 
 
 tile_images = {
-    'wall': None,
-    'empty': pygame.transform.scale(load_image('grass.png'), (30, 30))
+    'wall': pygame.transform.scale(load_image('mgrass.png'), (30, 30)),
+    'empty': pygame.transform.scale(load_image('grass.png'), (30, 30)),
+    'road': pygame.transform.scale(load_image('road.png'), (30, 30)),
+    'lbroad': pygame.transform.scale(load_image('lbroad.png'), (30, 30)),
+    'rbroad': pygame.transform.scale(load_image('rbroad.png'), (30, 30)),
+    'luroad': pygame.transform.scale(load_image('luroad.png'), (30, 30)),
+    'ruroad': pygame.transform.scale(load_image('ruroad.png'), (30, 30)),
+    'tree': pygame.transform.scale(load_image('tgrass.png'), (30, 30)),
+    'groad': pygame.transform.scale(load_image('groad.png'), (30, 30)),
+
+    'griver': pygame.transform.scale(load_image('griver.png'), (30, 30)),
+    'river': pygame.transform.scale(load_image('river.png'), (30, 30)),
+    'lbriver': pygame.transform.scale(load_image('lbriver.png'), (30, 30)),
+    'rbriver': pygame.transform.scale(load_image('rbriver.png'), (30, 30)),
+    'luriver': pygame.transform.scale(load_image('luriver.png'), (30, 30)),
+    'ruriver': pygame.transform.scale(load_image('ruriver.png'), (30, 30)),
+    'griverb': pygame.transform.scale(load_image('griverb.png'), (30, 30))
 }
 player_image = None
 

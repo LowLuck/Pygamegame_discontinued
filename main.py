@@ -11,8 +11,6 @@ all_sprites = pygame.sprite.Group()
 pygame.display.set_caption('P2C1 WIP')
 fps = 50
 
-walls = []
-
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -45,67 +43,101 @@ def terminate():
     sys.exit()
 
 
+maps = []
+
+
 def generate_level(level):
-    global walls
-    new_player, x, y = None, None, None
+    # 0 - поле, 1 - горы, 2 - лес, 3 - река, 4 - база игрока1, \
+    # 5 - база игрока2, 6 - нейтр. город, 7 - крепость, 8 - рудник, 9 - дорога
+    global maps
+    temp = []
+    x, y = None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == '.':
                 Tile('empty', x, y)
+                temp.append(0)
             elif level[y][x] == '#':
                 Tile('wall', x, y)
-                walls.append([x, y])
+                temp.append(1)
             elif level[y][x] == '%':
                 Tile('bigtown', x, y)
+                temp.append(7)
             elif level[y][x] == '$':
                 Tile('coin', x, y)
+                temp.append(8)
             elif level[y][x] == '+':
                 Tile('road', x, y)
+                temp.append(9)
             elif level[y][x] == '-':
                 Tile('groad', x, y)
+                temp.append(9)
             elif level[y][x] == '[':
                 Tile('lbroad', x, y)
+                temp.append(9)
             elif level[y][x] == 'T':
                 Tile('troad', x, y)
+                temp.append(9)
             elif level[y][x] == 'r':
                 Tile('rtroad', x, y)
+                temp.append(9)
             elif level[y][x] == 'e':
                 Tile('retroad', x, y)
+                temp.append(9)
             elif level[y][x] == ']':
                 Tile('rbroad', x, y)
+                temp.append(9)
             elif level[y][x] == 'o':
                 Tile('luroad', x, y)
+                temp.append(9)
             elif level[y][x] == 'p':
                 Tile('ruroad', x, y)
+                temp.append(9)
             elif level[y][x] == 'c':
                 Tile('croad', x, y)
+                temp.append(9)
             elif level[y][x] == 'u':
                 Tile('ltroad', x, y)
-
+                temp.append(9)
             elif level[y][x] == 't':
                 Tile('tree', x, y)
+                temp.append(2)
             elif level[y][x] == '8':
                 Tile('river', x, y)
+                temp.append(3)
             elif level[y][x] == '6':
                 Tile('griver', x, y)
+                temp.append(3)
             elif level[y][x] == '3':
                 Tile('rbriver', x, y)
+                temp.append(3)
             elif level[y][x] == '7':
                 Tile('luriver', x, y)
+                temp.append(3)
             elif level[y][x] == '9':
                 Tile('ruriver', x, y)
+                temp.append(3)
             elif level[y][x] == '1':
                 Tile('lbriver', x, y)
+                temp.append(3)
             elif level[y][x] == 'b':
                 Tile('griverb', x, y)
+                temp.append(3)
             elif level[y][x] == 'd':
                 Tile('riverb', x, y)
+                temp.append(3)
             elif level[y][x] == 'n':
                 Tile('smalltown', x, y)
+                temp.append(6)
             elif level[y][x] == 'x':
                 Tile('smalltowna', x, y)
+                temp.append(4)
             elif level[y][x] == 'y':
                 Tile('smalltownb', x, y)
+                temp.append(5)
+        if temp:
+            maps.append(temp)
+            temp = []
     return x, y
 
 
@@ -154,6 +186,15 @@ class Tile(pygame.sprite.Sprite):
             tile_width * pos_x + move, tile_height * pos_y)
 
 
+class Swords(pygame.sprite.Sprite):
+    def __init__(self, typer):
+        super().__init__(tiles_group, all_sprites)
+        self.image = load_image('Swordbig.png')
+        if typer == 'me':
+            self.rect = self.image.get_rect().move(30 * 27 + 290, 30 * 28 - 10)
+
+
+war_group = pygame.sprite.Group()
 end_group = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 level_x, level_y = generate_level(load_level('map.txt'))
@@ -162,10 +203,22 @@ clock = pygame.time.Clock()
 running = True
 
 while running:
+    war_group.draw(screen)
     tiles_group.draw(screen)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_x:
+                Swords('me')
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.pos[0] > 300:
+                first = (event.pos[0] - 300) // 30
+                second = event.pos[1] // 30
+                if second <= 29:
+                    print(first)
+                    print(second)
+                    print(maps[second][first])
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()

@@ -55,9 +55,6 @@ def generate_level(level):
             elif level[y][x] == '#':
                 Tile('wall', x, y)
                 walls.append([x, y])
-            elif level[y][x] == '@':
-                Tile('empty', x, y)
-                new_player = Player(x, y)
             elif level[y][x] == '%':
                 Tile('bigtown', x, y)
             elif level[y][x] == '$':
@@ -85,7 +82,6 @@ def generate_level(level):
             elif level[y][x] == 'u':
                 Tile('ltroad', x, y)
 
-
             elif level[y][x] == 't':
                 Tile('tree', x, y)
             elif level[y][x] == '8':
@@ -110,7 +106,7 @@ def generate_level(level):
                 Tile('smalltowna', x, y)
             elif level[y][x] == 'y':
                 Tile('smalltownb', x, y)
-    return new_player, x, y
+    return x, y
 
 
 tile_images = {
@@ -145,7 +141,6 @@ tile_images = {
     'coina': pygame.transform.scale(load_image('coina.png'), (30, 30)),
     'coinb': pygame.transform.scale(load_image('coinb.png'), (30, 30)),
 }
-player_image = None
 
 tile_width = tile_height = 30
 
@@ -159,32 +154,9 @@ class Tile(pygame.sprite.Sprite):
             tile_width * pos_x + move, tile_height * pos_y)
 
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y):
-        super().__init__(player_group, all_sprites)
-        self.px = pos_x
-        self.py = pos_y
-        self.image = player_image
-        self.rect = self.image.get_rect().move(
-            tile_width * self.px + 15, tile_height * self.py + 5)
-        self.post = [4, 4]
-
-
-class Bomb(pygame.sprite.Sprite):
-    image = None
-
-    def __init__(self, *group):
-        super().__init__(*group)
-        self.image = Bomb.image
-        self.rect = self.image.get_rect()
-        self.rect.x = 0
-
-
 end_group = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
-player_group = pygame.sprite.Group()
-
-player, level_x, level_y = generate_level(load_level('map.txt'))
+level_x, level_y = generate_level(load_level('map.txt'))
 
 clock = pygame.time.Clock()
 running = True

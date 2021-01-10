@@ -187,38 +187,197 @@ class Tile(pygame.sprite.Sprite):
 
 
 class Swords(pygame.sprite.Sprite):
+    global warmap
+
     def __init__(self, typer):
-        super().__init__(tiles_group, all_sprites)
+        super().__init__(war_group)
         self.image = load_image('Swordbig.png')
         if typer == 'me':
             self.rect = self.image.get_rect().move(30 * 27 + 290, 30 * 28 - 10)
+            warmap[27][28] = 1
+
+    def update(self, move):
+        if move == '1':
+            self.rect[0] -= 1
+        elif move == '2':
+            self.rect[1] -= 1
+        elif move == '3':
+            self.rect[0] += 1
+        elif move == '4':
+            self.rect[1] += 1
 
 
+class Units(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(tiles_group, all_sprites)
+        self.image = load_image('Units.png')
+        self.rect = self.image.get_rect().move(0, 0)
+
+
+design_group = pygame.sprite.Group()
 war_group = pygame.sprite.Group()
 end_group = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 level_x, level_y = generate_level(load_level('map.txt'))
 
+warmap = [[0 for j in range(30)] for i in range(30)]
+# 1 - мечники
+
 clock = pygame.time.Clock()
 running = True
+superlist = []
+betterlist = []
+mover = []
+last1 = 27
+last2 = 28
+movek = 0
+moverv = [0, 0]
+moverg = [0, 0]
+c = -1
+n = 0
+made = False
+drawer = False
+fixer = False
+FIX = False
+spawned = False
 
+Units()
 while running:
-    war_group.draw(screen)
     tiles_group.draw(screen)
+    war_group.draw(screen)
+    design_group.draw(screen)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_x:
                 Swords('me')
+                spawned = True
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.pos[0] > 300:
                 first = (event.pos[0] - 300) // 30
                 second = event.pos[1] // 30
-                if second <= 29:
-                    print(first)
-                    print(second)
-                    print(maps[second][first])
+                # if second <= 29:
+                # print(first)
+                # print(second)
+                # print(maps[second][first])
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 2:
+            first = (event.pos[0] - 300) // 30
+            second = event.pos[1] // 30
+            if warmap[first][second] != 0:
+                drawer = True
+                saver = (first, second)
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
+            drawer = False
+        if event.type == pygame.MOUSEMOTION and drawer:
+            if event.pos[0] > 300:
+                first = (event.pos[0] - 300) // 30
+                second = event.pos[1] // 30
+                if (first * 30 + 300, second * 30) not in superlist and second <= 29:
+                    superlist.append((first * 30 + 300, second * 30))
+                    betterlist.append((first, second))
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_l:
+                superlist = []
+            elif event.key == pygame.K_k and spawned:
+                drawer = False
+                superlist = []
+                f = True
+                moverv = []
+                moverg = []
+                try:
+                    newgen = saver[0]
+                    newestgen = saver[1]
+                except BaseException:
+                    pass
+                FIX = False
+                i = []
+                for j in betterlist:
+                    if f:
+                        i = j
+                        f = False
+                    else:
+                        dif1 = i[0] - j[0]
+                        dif2 = i[1] - j[1]
+
+                        i = j
+                        if dif1 == 1:
+                            warmap[newgen][newestgen] = 0
+                            warmap[newgen - 1][newestgen] = 1
+                            print(newgen - 1)
+                            print(newestgen)
+                            newgen -= 1
+                        if dif1 == -1:
+                            warmap[newgen][newestgen] = 0
+                            warmap[newgen + 1][newestgen] = 1
+                            newgen += 1
+
+                        if dif2 == 1:
+                            warmap[newgen][newestgen] = 0
+                            warmap[newgen][newestgen - 1] = 1
+                            newestgen -= 1
+                        if dif2 == -1:
+                            warmap[newgen][newestgen] = 0
+                            warmap[newgen][newestgen + 1] = 1
+                            newestgen += 1
+                        moverg.append(dif1)
+                        moverv.append(dif2)
+                        betterlist = []
+                fixer = True
+    if fixer and moverg and moverv:
+        if moverg[n] == 1:
+            movek = 1
+            if not made:
+                c = 30
+                made = True
+        elif moverg[n] == -1:
+            movek = 2
+            if not made:
+                c = 30
+                made = True
+
+        if moverv[n] == 1:
+            movek = 3
+            if not made:
+                c = 30
+                made = True
+        elif moverv[n] == -1:
+            movek = 4
+            if not made:
+                c = 30
+                made = True
+
+        if movek == 1 and c != 0:
+            war_group.update('1')
+            c -= 1
+        if movek == 2 and c != 0:
+            war_group.update('3')
+            c -= 1
+        if movek == 3 and c != 0:
+            war_group.update('2')
+            c -= 1
+        if movek == 4 and c != 0:
+            war_group.update('4')
+            c -= 1
+        elif c == 0:
+            made = False
+            movek = 0
+            if n + 1 < len(moverg):
+                n += 1
+            else:
+                moverg = [0, 0]
+                moverv = [0, 0]
+                n = 0
+                fixer = False
+
+    try:
+        for j in superlist:
+            firsts = j[0]
+            seconds = j[1]
+            pygame.draw.rect(screen, (255, 255, 0), (firsts, seconds, 30, 30), 1)
+    except Exception:
+        pass
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()

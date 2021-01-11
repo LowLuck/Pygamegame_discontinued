@@ -240,6 +240,7 @@ drawer = False
 fixer = False
 FIX = False
 spawned = False
+moved = False
 
 Units()
 while running:
@@ -300,49 +301,55 @@ while running:
                     else:
                         dif1 = i[0] - j[0]
                         dif2 = i[1] - j[1]
-
                         i = j
-                        if dif1 == 1:
-                            warmap[newgen][newestgen] = 0
-                            warmap[newgen - 1][newestgen] = 1
-                            print(newgen - 1)
-                            print(newestgen)
-                            newgen -= 1
-                        if dif1 == -1:
-                            warmap[newgen][newestgen] = 0
-                            warmap[newgen + 1][newestgen] = 1
-                            newgen += 1
-
-                        if dif2 == 1:
-                            warmap[newgen][newestgen] = 0
-                            warmap[newgen][newestgen - 1] = 1
-                            newestgen -= 1
-                        if dif2 == -1:
-                            warmap[newgen][newestgen] = 0
-                            warmap[newgen][newestgen + 1] = 1
-                            newestgen += 1
                         moverg.append(dif1)
                         moverv.append(dif2)
-                        betterlist = []
+
                 fixer = True
+
+
     if fixer and moverg and moverv:
         if moverg[n] == 1:
+            if not moved:
+                warmap[newgen][newestgen] = 0
+                warmap[newgen - 1][newestgen] = 1
+                newgen -= 1
+                print('left')
+                moved = True
             movek = 1
             if not made:
                 c = 30
                 made = True
         elif moverg[n] == -1:
             movek = 2
+            if not moved:
+                warmap[newgen][newestgen] = 0
+                warmap[newgen + 1][newestgen] = 1
+                newgen += 1
+                print('right')
+                moved = True
             if not made:
                 c = 30
                 made = True
 
         if moverv[n] == 1:
             movek = 3
+            if not moved:
+                warmap[newgen][newestgen] = 0
+                warmap[newgen][newestgen - 1] = 1
+                newestgen -= 1
+                print('up')
+                moved = True
             if not made:
                 c = 30
                 made = True
         elif moverv[n] == -1:
+            if not moved:
+                warmap[newgen][newestgen] = 0
+                warmap[newgen][newestgen + 1] = 1
+                newestgen += 1
+                print('duwn')
+                moved = True
             movek = 4
             if not made:
                 c = 30
@@ -362,13 +369,16 @@ while running:
             c -= 1
         elif c == 0:
             made = False
+            moved = False
             movek = 0
+            betterlist = []
             if n + 1 < len(moverg):
                 n += 1
             else:
                 moverg = [0, 0]
                 moverv = [0, 0]
                 n = 0
+
                 fixer = False
 
     try:

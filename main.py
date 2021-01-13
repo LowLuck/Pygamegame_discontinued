@@ -172,6 +172,7 @@ tile_images = {
     'coin': pygame.transform.scale(load_image('coin.png'), (30, 30)),
     'coina': pygame.transform.scale(load_image('coina.png'), (30, 30)),
     'coinb': pygame.transform.scale(load_image('coinb.png'), (30, 30)),
+
 }
 
 tile_width = tile_height = 30
@@ -209,9 +210,33 @@ class Swords(pygame.sprite.Sprite):
 
 class Units(pygame.sprite.Sprite):
     def __init__(self):
-        super().__init__(tiles_group, all_sprites)
+        super().__init__(design_group, all_sprites)
         self.image = load_image('Units.png')
         self.rect = self.image.get_rect().move(0, 0)
+
+
+class Icons(pygame.sprite.Sprite):
+    def __init__(self, number):
+        super().__init__(design_group, all_sprites)
+        self.base = True
+        self.n = number
+        self.redraw()
+        self.rect = self.image.get_rect().move(0, 100 * number)
+        self.multi = 100
+        pygame.draw.rect(screen, (0, 255, 0), (4, 100 * number + 85, (293 * self.multi), 12), 0)
+
+    def redraw(self):
+        if self.base:
+            self.image = load_image('Swords' + str(self.n) + '.png')
+        else:
+            self.image = load_image('Swords' + str(self.n) + 'active.png')
+
+    def change(self):
+        self.base = not self.base
+        self.redraw()
+
+    def reheal(self, into):
+        self.multi += into
 
 
 design_group = pygame.sprite.Group()
@@ -235,12 +260,17 @@ moverv = [0, 0]
 moverg = [0, 0]
 c = -1
 n = 0
+chosen = 0
+name = 0
 made = False
 drawer = False
 fixer = False
 FIX = False
-spawned = False
 moved = False
+allow = -1
+promove = []
+
+unitcount = 0
 
 Units()
 while running:
@@ -252,8 +282,31 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_x:
-                Swords('me')
-                spawned = True
+                if name == 0:
+                    Sword0 = Swords('me')
+                    name += 1
+                    icon0 = Icons(1)
+                    promove.append(0)
+                elif name == 1:
+                    Sword1 = Swords('me')
+                    name += 1
+                    icon1 = Icons(2)
+                    promove.append(0)
+                elif name == 2:
+                    Sword2 = Swords('me')
+                    name += 1
+                    icon2 = Icons(3)
+                    promove.append(0)
+                elif name == 3:
+                    Sword3 = Swords('me')
+                    name += 1
+                    icon3 = Icons(4)
+                    promove.append(0)
+                elif name == 4:
+                    Sword4 = Swords('me')
+                    name += 1
+                    icon4 = Icons(5)
+                    promove.append(0)
         if event.type == pygame.MOUSEBUTTONDOWN:
             if event.pos[0] > 300:
                 first = (event.pos[0] - 300) // 30
@@ -262,12 +315,64 @@ while running:
                 # print(first)
                 # print(second)
                 # print(maps[second][first])
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 2:
+            if (100 < event.pos[1] < 199) and event.pos[0] < 200 and len(promove) >= 1:
+                try:
+                    icon0.change()
+                except Exception:
+                    pass
+                if allow != -1:
+                    allow = -1
+                else:
+                    allow = 0
+
+            elif (200 < event.pos[1] < 299) and event.pos[0] < 200 and len(promove) >= 2:
+                try:
+                    icon1.change()
+                except Exception:
+                    pass
+                if allow != -1:
+                    allow = -1
+                else:
+                    allow = 1
+
+            elif (300 < event.pos[1] < 399) and event.pos[0] < 200 and len(promove) >= 3:
+                try:
+                    icon2.change()
+                except Exception:
+                    pass
+                if allow != -1:
+                    allow = -1
+                else:
+                    allow = 2
+
+            elif (400 < event.pos[1] < 499) and event.pos[0] < 200 and len(promove) >= 4:
+                try:
+                    icon3.change()
+                except Exception:
+                    pass
+                if allow != -1:
+                    allow = -1
+                else:
+                    allow = 3
+
+            elif (500 < event.pos[1] < 599) and event.pos[0] < 200 and len(promove) >= 5:
+                try:
+                    icon4.change()
+                except Exception:
+                    pass
+                if allow != -1:
+                    allow = -1
+                else:
+                    allow = 4
+
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 2 and allow != -1:
             first = (event.pos[0] - 300) // 30
             second = event.pos[1] // 30
             if warmap[first][second] != 0:
                 drawer = True
+                print(allow)
                 saver = (first, second)
+
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
             drawer = False
         if event.type == pygame.MOUSEMOTION and drawer:
@@ -281,7 +386,7 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_l:
                 superlist = []
-            elif event.key == pygame.K_k and spawned:
+            elif event.key == pygame.K_k and len(promove) >= 1:
                 drawer = False
                 superlist = []
                 f = True
@@ -306,7 +411,6 @@ while running:
                         moverv.append(dif2)
 
                 fixer = True
-
 
     if fixer and moverg and moverv:
         if moverg[n] == 1:
@@ -355,18 +459,71 @@ while running:
                 c = 30
                 made = True
 
-        if movek == 1 and c != 0:
-            war_group.update('1')
+        if movek == 1 and c != 0 and allow == 0:
+            Sword0.update('1')
             c -= 1
-        if movek == 2 and c != 0:
-            war_group.update('3')
+        if movek == 2 and c != 0 and allow == 0:
+            Sword0.update('3')
             c -= 1
-        if movek == 3 and c != 0:
-            war_group.update('2')
+        if movek == 3 and c != 0 and allow == 0:
+            Sword0.update('2')
             c -= 1
-        if movek == 4 and c != 0:
-            war_group.update('4')
+        if movek == 4 and c != 0 and allow == 0:
+            Sword0.update('4')
             c -= 1
+
+        if movek == 1 and c != 0 and allow == 1:
+            Sword1.update('1')
+            c -= 1
+        if movek == 2 and c != 0 and allow == 1:
+            Sword1.update('3')
+            c -= 1
+        if movek == 3 and c != 0 and allow == 1:
+            Sword1.update('2')
+            c -= 1
+        if movek == 4 and c != 0 and allow == 1:
+            Sword1.update('4')
+            c -= 1
+
+        if movek == 1 and c != 0 and allow == 2:
+            Sword2.update('1')
+            c -= 1
+        if movek == 2 and c != 0 and allow == 2:
+            Sword2.update('3')
+            c -= 1
+        if movek == 3 and c != 0 and allow == 2:
+            Sword2.update('2')
+            c -= 1
+        if movek == 4 and c != 0 and allow == 2:
+            Sword2.update('4')
+            c -= 1
+
+        if movek == 1 and c != 0 and allow == 3:
+            Sword3.update('1')
+            c -= 1
+        if movek == 2 and c != 0 and allow == 3:
+            Sword3.update('3')
+            c -= 1
+        if movek == 3 and c != 0 and allow == 3:
+            Sword3.update('2')
+            c -= 1
+        if movek == 4 and c != 0 and allow == 3:
+            Sword3.update('4')
+            c -= 1
+
+        if movek == 1 and c != 0 and allow == 4:
+            Sword4.update('1')
+            c -= 1
+        if movek == 2 and c != 0 and allow == 4:
+            Sword4.update('3')
+            c -= 1
+        if movek == 3 and c != 0 and allow == 4:
+            Sword4.update('2')
+            c -= 1
+        if movek == 4 and c != 0 and allow == 4:
+            Sword4.update('4')
+            c -= 1
+
         elif c == 0:
             made = False
             moved = False

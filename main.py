@@ -188,14 +188,11 @@ class Tile(pygame.sprite.Sprite):
 
 
 class Swords(pygame.sprite.Sprite):
-    global warmap
-
     def __init__(self, typer):
         super().__init__(war_group)
         self.image = load_image('Swordbig.png')
         if typer == 'me':
             self.rect = self.image.get_rect().move(30 * 27 + 290, 30 * 28 - 10)
-            warmap[27][28] = 1
 
     def update(self, move, speed):
         if move == '1':
@@ -206,6 +203,9 @@ class Swords(pygame.sprite.Sprite):
             self.rect[0] += speed
         elif move == '4':
             self.rect[1] += speed
+
+    def getrect(self):
+        return (self.rect[0] - 300) // 30, self.rect[1] // 30
 
 
 class Units(pygame.sprite.Sprite):
@@ -258,10 +258,12 @@ c = -1
 name = 0
 promove = []
 already = []
-drown = []
 allow = -1
+work = False
+position = 0
 
-
+moveg = []
+movev = []
 Units()
 while running:
     tiles_group.draw(screen)
@@ -297,88 +299,95 @@ while running:
                     name += 1
                     icon4 = Icons(5)
                     promove.append(0)
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.pos[0] > 300:
-                first = (event.pos[0] - 300) // 30
-                second = event.pos[1] // 30
-                # if second <= 29:
-                # print(first)
-                # print(second)
-                # print(maps[second][first])
-            if (100 < event.pos[1] < 199) and event.pos[0] < 200 and len(promove) >= 1:
-                try:
-                    icon0.change()
-                    icon1.back()
-                    icon2.back()
-                    icon3.back()
-                    icon4.back()
-                except Exception:
-                    pass
-                allow = 0
 
-            elif (200 < event.pos[1] < 299) and event.pos[0] < 200 and len(promove) >= 2:
-                try:
-                    icon1.change()
-                    icon0.back()
-                    icon2.back()
-                    icon3.back()
-                    icon4.back()
-                except Exception:
-                    pass
-                allow = 1
+            elif event.key == pygame.K_l:
+                already = []
+                movev = []
+                moveg = []
+            elif event.key == pygame.K_k:
+                move = []
+                for j in range(len(already)):
+                    if j + 1 < len(already):
+                        moveg.append(already[j][0] - already[j + 1][0])
+                        movev.append(already[j][1] - already[j + 1][1])
+                work = True
 
-            elif (300 < event.pos[1] < 399) and event.pos[0] < 200 and len(promove) >= 3:
-                try:
-                    icon2.change()
-                    icon0.back()
-                    icon1.back()
-                    icon3.back()
-                    icon4.back()
-                except Exception:
-                    pass
-                allow = 2
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if (100 < event.pos[1] < 199) and event.pos[0] < 200 and len(promove) >= 1:
+                    try:
+                        icon0.change()
+                        icon1.back()
+                        icon2.back()
+                        icon3.back()
+                        icon4.back()
+                    except Exception:
+                        pass
+                    allow = 0
 
-            elif (400 < event.pos[1] < 499) and event.pos[0] < 200 and len(promove) >= 4:
-                try:
-                    icon3.change()
-                    icon0.back()
-                    icon1.back()
-                    icon2.back()
-                    icon4.back()
-                except Exception:
-                    pass
-                allow = 3
+                elif (200 < event.pos[1] < 299) and event.pos[0] < 200 and len(promove) >= 2:
+                    try:
+                        icon1.change()
+                        icon0.back()
+                        icon2.back()
+                        icon3.back()
+                        icon4.back()
+                    except Exception:
+                        pass
+                    allow = 1
 
-            elif (500 < event.pos[1] < 599) and event.pos[0] < 200 and len(promove) >= 5:
-                try:
-                    icon4.change()
-                    icon0.back()
-                    icon1.back()
-                    icon2.back()
-                    icon3.back()
-                except Exception:
-                    pass
-                allow = 4
-            elif event.pos[1] > 599 and event.pos[0] < 200:
-                try:
-                    allow = -1
-                    icon0.back()
-                    icon1.back()
-                    icon2.back()
-                    icon3.back()
-                    icon4.back()
-                except Exception:
-                    pass
+                elif (300 < event.pos[1] < 399) and event.pos[0] < 200 and len(promove) >= 3:
+                    try:
+                        icon2.change()
+                        icon0.back()
+                        icon1.back()
+                        icon3.back()
+                        icon4.back()
+                    except Exception:
+                        pass
+                    allow = 2
+
+                elif (400 < event.pos[1] < 499) and event.pos[0] < 200 and len(promove) >= 4:
+                    try:
+                        icon3.change()
+                        icon0.back()
+                        icon1.back()
+                        icon2.back()
+                        icon4.back()
+                    except Exception:
+                        pass
+                    allow = 3
+
+                elif (500 < event.pos[1] < 599) and event.pos[0] < 200 and len(promove) >= 5:
+                    try:
+                        icon4.change()
+                        icon0.back()
+                        icon1.back()
+                        icon2.back()
+                        icon3.back()
+                    except Exception:
+                        pass
+                    allow = 4
+                elif event.pos[1] > 599 and event.pos[0] < 200:
+                    try:
+                        allow = -1
+                        icon0.back()
+                        icon1.back()
+                        icon2.back()
+                        icon3.back()
+                        icon4.back()
+                    except Exception:
+                        pass
 
         if pygame.mouse.get_pressed()[0]:
             if event.pos[0] > 300 and event.pos[1] < 900:
                 if ((event.pos[0] - 300) // 30, event.pos[1] // 30) not in already:
                     already.append(((event.pos[0] - 300) // 30, event.pos[1] // 30))
-                    print(already)
+    if work:
+        if allow == 1:
+            pass
 
     for j in already:
         pygame.draw.rect(screen, (255, 255, 0), (j[0] * 30 + 300, j[1] * 30, 30, 30), 1)
-        drown.append(j)
 
     pygame.display.flip()
     clock.tick(60)

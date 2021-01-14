@@ -235,6 +235,10 @@ class Icons(pygame.sprite.Sprite):
         self.base = not self.base
         self.redraw()
 
+    def back(self):
+        self.base = True
+        self.redraw()
+
     def reheal(self, into):
         self.multi += into
 
@@ -265,12 +269,12 @@ name = 0
 made = False
 drawer = False
 fixer = False
-FIX = False
 moved = False
 allow = -1
 promove = []
 
 unitcount = 0
+
 
 Units()
 while running:
@@ -318,52 +322,67 @@ while running:
             if (100 < event.pos[1] < 199) and event.pos[0] < 200 and len(promove) >= 1:
                 try:
                     icon0.change()
+                    icon1.back()
+                    icon2.back()
+                    icon3.back()
+                    icon4.back()
                 except Exception:
                     pass
-                if allow != -1:
-                    allow = -1
-                else:
-                    allow = 0
+                allow = 0
 
             elif (200 < event.pos[1] < 299) and event.pos[0] < 200 and len(promove) >= 2:
                 try:
                     icon1.change()
+                    icon0.back()
+                    icon2.back()
+                    icon3.back()
+                    icon4.back()
                 except Exception:
                     pass
-                if allow != -1:
-                    allow = -1
-                else:
-                    allow = 1
+                allow = 1
 
             elif (300 < event.pos[1] < 399) and event.pos[0] < 200 and len(promove) >= 3:
                 try:
                     icon2.change()
+                    icon0.back()
+                    icon1.back()
+                    icon3.back()
+                    icon4.back()
                 except Exception:
                     pass
-                if allow != -1:
-                    allow = -1
-                else:
-                    allow = 2
+                allow = 2
 
             elif (400 < event.pos[1] < 499) and event.pos[0] < 200 and len(promove) >= 4:
                 try:
                     icon3.change()
+                    icon0.back()
+                    icon1.back()
+                    icon2.back()
+                    icon4.back()
                 except Exception:
                     pass
-                if allow != -1:
-                    allow = -1
-                else:
-                    allow = 3
+                allow = 3
 
             elif (500 < event.pos[1] < 599) and event.pos[0] < 200 and len(promove) >= 5:
                 try:
                     icon4.change()
+                    icon0.back()
+                    icon1.back()
+                    icon2.back()
+                    icon3.back()
                 except Exception:
                     pass
-                if allow != -1:
+                allow = 4
+            elif event.pos[1] > 599 and event.pos[0] < 200:
+                try:
                     allow = -1
-                else:
-                    allow = 4
+                    icon0.back()
+                    icon1.back()
+                    icon2.back()
+                    icon3.back()
+                    icon4.back()
+                except Exception:
+                    pass
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 2 and allow != -1:
             first = (event.pos[0] - 300) // 30
@@ -397,7 +416,6 @@ while running:
                     newestgen = saver[1]
                 except BaseException:
                     pass
-                FIX = False
                 i = []
                 for j in betterlist:
                     if f:

@@ -197,15 +197,15 @@ class Swords(pygame.sprite.Sprite):
             self.rect = self.image.get_rect().move(30 * 27 + 290, 30 * 28 - 10)
             warmap[27][28] = 1
 
-    def update(self, move):
+    def update(self, move, speed):
         if move == '1':
-            self.rect[0] -= 1
+            self.rect[0] -= speed
         elif move == '2':
-            self.rect[1] -= 1
+            self.rect[1] -= speed
         elif move == '3':
-            self.rect[0] += 1
+            self.rect[0] += speed
         elif move == '4':
-            self.rect[1] += 1
+            self.rect[1] += speed
 
 
 class Units(pygame.sprite.Sprite):
@@ -254,26 +254,12 @@ warmap = [[0 for j in range(30)] for i in range(30)]
 
 clock = pygame.time.Clock()
 running = True
-superlist = []
-betterlist = []
-mover = []
-last1 = 27
-last2 = 28
-movek = 0
-moverv = [0, 0]
-moverg = [0, 0]
 c = -1
-n = 0
-chosen = 0
 name = 0
-made = False
-drawer = False
-fixer = False
-moved = False
-allow = -1
 promove = []
-
-unitcount = 0
+already = []
+drown = []
+allow = -1
 
 
 Units()
@@ -384,185 +370,16 @@ while running:
                 except Exception:
                     pass
 
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 2 and allow != -1:
-            first = (event.pos[0] - 300) // 30
-            second = event.pos[1] // 30
-            if warmap[first][second] != 0:
-                drawer = True
-                print(allow)
-                saver = (first, second)
+        if pygame.mouse.get_pressed()[0]:
+            if event.pos[0] > 300 and event.pos[1] < 900:
+                if ((event.pos[0] - 300) // 30, event.pos[1] // 30) not in already:
+                    already.append(((event.pos[0] - 300) // 30, event.pos[1] // 30))
+                    print(already)
 
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
-            drawer = False
-        if event.type == pygame.MOUSEMOTION and drawer:
-            if event.pos[0] > 300:
-                first = (event.pos[0] - 300) // 30
-                second = event.pos[1] // 30
-                if (first * 30 + 300, second * 30) not in superlist and second <= 29:
-                    superlist.append((first * 30 + 300, second * 30))
-                    betterlist.append((first, second))
+    for j in already:
+        pygame.draw.rect(screen, (255, 255, 0), (j[0] * 30 + 300, j[1] * 30, 30, 30), 1)
+        drown.append(j)
 
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_l:
-                superlist = []
-            elif event.key == pygame.K_k and len(promove) >= 1:
-                drawer = False
-                superlist = []
-                f = True
-                moverv = []
-                moverg = []
-                try:
-                    newgen = saver[0]
-                    newestgen = saver[1]
-                except BaseException:
-                    pass
-                i = []
-                for j in betterlist:
-                    if f:
-                        i = j
-                        f = False
-                    else:
-                        dif1 = i[0] - j[0]
-                        dif2 = i[1] - j[1]
-                        i = j
-                        moverg.append(dif1)
-                        moverv.append(dif2)
-
-                fixer = True
-
-    if fixer and moverg and moverv:
-        if moverg[n] == 1:
-            if not moved:
-                warmap[newgen][newestgen] = 0
-                warmap[newgen - 1][newestgen] = 1
-                newgen -= 1
-                print('left')
-                moved = True
-            movek = 1
-            if not made:
-                c = 30
-                made = True
-        elif moverg[n] == -1:
-            movek = 2
-            if not moved:
-                warmap[newgen][newestgen] = 0
-                warmap[newgen + 1][newestgen] = 1
-                newgen += 1
-                print('right')
-                moved = True
-            if not made:
-                c = 30
-                made = True
-
-        if moverv[n] == 1:
-            movek = 3
-            if not moved:
-                warmap[newgen][newestgen] = 0
-                warmap[newgen][newestgen - 1] = 1
-                newestgen -= 1
-                print('up')
-                moved = True
-            if not made:
-                c = 30
-                made = True
-        elif moverv[n] == -1:
-            if not moved:
-                warmap[newgen][newestgen] = 0
-                warmap[newgen][newestgen + 1] = 1
-                newestgen += 1
-                print('duwn')
-                moved = True
-            movek = 4
-            if not made:
-                c = 30
-                made = True
-
-        if movek == 1 and c != 0 and allow == 0:
-            Sword0.update('1')
-            c -= 1
-        if movek == 2 and c != 0 and allow == 0:
-            Sword0.update('3')
-            c -= 1
-        if movek == 3 and c != 0 and allow == 0:
-            Sword0.update('2')
-            c -= 1
-        if movek == 4 and c != 0 and allow == 0:
-            Sword0.update('4')
-            c -= 1
-
-        if movek == 1 and c != 0 and allow == 1:
-            Sword1.update('1')
-            c -= 1
-        if movek == 2 and c != 0 and allow == 1:
-            Sword1.update('3')
-            c -= 1
-        if movek == 3 and c != 0 and allow == 1:
-            Sword1.update('2')
-            c -= 1
-        if movek == 4 and c != 0 and allow == 1:
-            Sword1.update('4')
-            c -= 1
-
-        if movek == 1 and c != 0 and allow == 2:
-            Sword2.update('1')
-            c -= 1
-        if movek == 2 and c != 0 and allow == 2:
-            Sword2.update('3')
-            c -= 1
-        if movek == 3 and c != 0 and allow == 2:
-            Sword2.update('2')
-            c -= 1
-        if movek == 4 and c != 0 and allow == 2:
-            Sword2.update('4')
-            c -= 1
-
-        if movek == 1 and c != 0 and allow == 3:
-            Sword3.update('1')
-            c -= 1
-        if movek == 2 and c != 0 and allow == 3:
-            Sword3.update('3')
-            c -= 1
-        if movek == 3 and c != 0 and allow == 3:
-            Sword3.update('2')
-            c -= 1
-        if movek == 4 and c != 0 and allow == 3:
-            Sword3.update('4')
-            c -= 1
-
-        if movek == 1 and c != 0 and allow == 4:
-            Sword4.update('1')
-            c -= 1
-        if movek == 2 and c != 0 and allow == 4:
-            Sword4.update('3')
-            c -= 1
-        if movek == 3 and c != 0 and allow == 4:
-            Sword4.update('2')
-            c -= 1
-        if movek == 4 and c != 0 and allow == 4:
-            Sword4.update('4')
-            c -= 1
-
-        elif c == 0:
-            made = False
-            moved = False
-            movek = 0
-            betterlist = []
-            if n + 1 < len(moverg):
-                n += 1
-            else:
-                moverg = [0, 0]
-                moverv = [0, 0]
-                n = 0
-
-                fixer = False
-
-    try:
-        for j in superlist:
-            firsts = j[0]
-            seconds = j[1]
-            pygame.draw.rect(screen, (255, 255, 0), (firsts, seconds, 30, 30), 1)
-    except Exception:
-        pass
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()

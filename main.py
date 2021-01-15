@@ -1,6 +1,7 @@
 import pygame
 import sys
 import os
+import pprint
 
 WIDTH = 1200
 HEIGHT = 1000
@@ -188,20 +189,19 @@ class Tile(pygame.sprite.Sprite):
 
 
 class Swords(pygame.sprite.Sprite):
-    def __init__(self, typer):
+    def __init__(self):
         super().__init__(war_group)
         self.image = load_image('Swordbig.png')
-        if typer == 'me':
-            self.rect = self.image.get_rect().move(30 * 27 + 290, 30 * 28 - 10)
+        self.rect = self.image.get_rect().move(30 * 27 + 290, 30 * 28 - 10)
 
     def update(self, move, speed):
-        if move == '1':
+        if move == 'left':
             self.rect[0] -= speed
-        elif move == '2':
+        elif move == 'up':
             self.rect[1] -= speed
-        elif move == '3':
+        elif move == 'right':
             self.rect[0] += speed
-        elif move == '4':
+        elif move == 'down':
             self.rect[1] += speed
 
     def getrect(self):
@@ -261,10 +261,14 @@ already = []
 allow = -1
 work = False
 position = 0
+point = ()
 
 moveg = []
 movev = []
+speedmap = []
 Units()
+qr = pprint.PrettyPrinter(width=41, compact=True)
+qr.pprint(maps)
 while running:
     tiles_group.draw(screen)
     war_group.draw(screen)
@@ -275,27 +279,27 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_x:
                 if name == 0:
-                    Sword0 = Swords('me')
+                    Sword0 = Swords()
                     name += 1
                     icon0 = Icons(1)
                     promove.append(0)
                 elif name == 1:
-                    Sword1 = Swords('me')
+                    Sword1 = Swords()
                     name += 1
                     icon1 = Icons(2)
                     promove.append(0)
                 elif name == 2:
-                    Sword2 = Swords('me')
+                    Sword2 = Swords()
                     name += 1
                     icon2 = Icons(3)
                     promove.append(0)
                 elif name == 3:
-                    Sword3 = Swords('me')
+                    Sword3 = Swords()
                     name += 1
                     icon3 = Icons(4)
                     promove.append(0)
                 elif name == 4:
-                    Sword4 = Swords('me')
+                    Sword4 = Swords()
                     name += 1
                     icon4 = Icons(5)
                     promove.append(0)
@@ -304,91 +308,129 @@ while running:
                 already = []
                 movev = []
                 moveg = []
+                speedmap = []
+                work = False
+                position = 0
+                c = 0
             elif event.key == pygame.K_k:
                 move = []
                 for j in range(len(already)):
                     if j + 1 < len(already):
                         moveg.append(already[j][0] - already[j + 1][0])
                         movev.append(already[j][1] - already[j + 1][1])
+                        point = already[j][0], already[j][1]
+                        print(maps[point[1]][point[0]])
+                        if maps[point[1]][point[0]] == 9:
+                            speedmap.append(2)
+                        elif maps[point[1]][point[0]] == 1:
+                            speedmap.append(0.5)
+                        elif maps[point[1]][point[0]] == 3:
+                            speedmap.append(0.5)
+                        else:
+                            speedmap.append(1)
+
                 work = True
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if (100 < event.pos[1] < 199) and event.pos[0] < 200 and len(promove) >= 1:
-                    try:
-                        icon0.change()
-                        icon1.back()
-                        icon2.back()
-                        icon3.back()
-                        icon4.back()
-                    except Exception:
-                        pass
-                    allow = 0
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if (100 < event.pos[1] < 199) and event.pos[0] < 200 and len(promove) >= 1:
+                try:
+                    icon0.change()
+                    icon1.back()
+                    icon2.back()
+                    icon3.back()
+                    icon4.back()
+                except NameError:
+                    pass
+                allow = 0
 
-                elif (200 < event.pos[1] < 299) and event.pos[0] < 200 and len(promove) >= 2:
-                    try:
-                        icon1.change()
-                        icon0.back()
-                        icon2.back()
-                        icon3.back()
-                        icon4.back()
-                    except Exception:
-                        pass
-                    allow = 1
+            elif (200 < event.pos[1] < 299) and event.pos[0] < 200 and len(promove) >= 2:
+                try:
+                    icon1.change()
+                    icon0.back()
+                    icon2.back()
+                    icon3.back()
+                    icon4.back()
+                except NameError:
+                    pass
+                allow = 1
 
-                elif (300 < event.pos[1] < 399) and event.pos[0] < 200 and len(promove) >= 3:
-                    try:
-                        icon2.change()
-                        icon0.back()
-                        icon1.back()
-                        icon3.back()
-                        icon4.back()
-                    except Exception:
-                        pass
-                    allow = 2
+            elif (300 < event.pos[1] < 399) and event.pos[0] < 200 and len(promove) >= 3:
+                try:
+                    icon2.change()
+                    icon0.back()
+                    icon1.back()
+                    icon3.back()
+                    icon4.back()
+                except NameError:
+                    pass
+                allow = 2
 
-                elif (400 < event.pos[1] < 499) and event.pos[0] < 200 and len(promove) >= 4:
-                    try:
-                        icon3.change()
-                        icon0.back()
-                        icon1.back()
-                        icon2.back()
-                        icon4.back()
-                    except Exception:
-                        pass
-                    allow = 3
+            elif (400 < event.pos[1] < 499) and event.pos[0] < 200 and len(promove) >= 4:
+                try:
+                    icon3.change()
+                    icon0.back()
+                    icon1.back()
+                    icon2.back()
+                    icon4.back()
+                except NameError:
+                    pass
+                allow = 3
 
-                elif (500 < event.pos[1] < 599) and event.pos[0] < 200 and len(promove) >= 5:
-                    try:
-                        icon4.change()
-                        icon0.back()
-                        icon1.back()
-                        icon2.back()
-                        icon3.back()
-                    except Exception:
-                        pass
-                    allow = 4
-                elif event.pos[1] > 599 and event.pos[0] < 200:
-                    try:
-                        allow = -1
-                        icon0.back()
-                        icon1.back()
-                        icon2.back()
-                        icon3.back()
-                        icon4.back()
-                    except Exception:
-                        pass
+            elif (500 < event.pos[1] < 599) and event.pos[0] < 200 and len(promove) >= 5:
+                try:
+                    icon4.change()
+                    icon0.back()
+                    icon1.back()
+                    icon2.back()
+                    icon3.back()
+                except NameError:
+                    pass
+                allow = 4
+            elif event.pos[1] > 599 and event.pos[0] < 200:
+                try:
+                    allow = -1
+                    icon0.back()
+                    icon1.back()
+                    icon2.back()
+                    icon3.back()
+                    icon4.back()
+                except NameError:
+                    pass
+    try:
+        if pygame.mouse.get_pressed()[0] and (event.pos[0] > 300 and event.pos[1] < 900):
+            if ((event.pos[0] - 300) // 30, event.pos[1] // 30) not in already:
+                already.append(((event.pos[0] - 300) // 30, event.pos[1] // 30))
+    except AttributeError:
+        pass
+    try:
+        if work:
+            if allow == 0:
+                if moveg[position] != 0:
+                    if moveg[position] == 1:
+                        Sword0.update('left', speedmap[position])
+                        c += 1
+                    elif moveg[position] == -1:
+                        Sword0.update('right', speedmap[position])
+                        c += 1
 
-        if pygame.mouse.get_pressed()[0]:
-            if event.pos[0] > 300 and event.pos[1] < 900:
-                if ((event.pos[0] - 300) // 30, event.pos[1] // 30) not in already:
-                    already.append(((event.pos[0] - 300) // 30, event.pos[1] // 30))
-    if work:
-        if allow == 1:
-            pass
+                if movev[position] != 0:
+                    if movev[position] == 1:
+                        Sword0.update('up', speedmap[position])
+                        c += 1
+                    elif movev[position] == -1:
+                        Sword0.update('down', speedmap[position])
+                        c += 1
+                if c == 30 // speedmap[position]:
+                    c = 0
+                    position += 1
 
+    except ValueError:
+        print('An error')
+    except IndexError:
+        pass
     for j in already:
         pygame.draw.rect(screen, (255, 255, 0), (j[0] * 30 + 300, j[1] * 30, 30, 30), 1)
 
     pygame.display.flip()
-    clock.tick(60)
+clock.tick(60)
 pygame.quit()

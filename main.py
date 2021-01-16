@@ -330,31 +330,25 @@ def moving(ico, diction):
     if moveg[position] != 0:
         if moveg[position] == 1:
             diction.get(ico.get_type()).update('left', speedmap[position])
-            c += 1
         elif moveg[position] == -1:
             diction.get(ico.get_type()).update('right', speedmap[position])
-            c += 1
+        c += 1
 
     if movev[position] != 0:
         if movev[position] == 1:
             diction.get(ico.get_type()).update('up', speedmap[position])
-            c += 1
         elif movev[position] == -1:
             diction.get(ico.get_type()).update('down', speedmap[position])
-            c += 1
+        c += 1
 
 
 def check():
     global speedmap
     global position
     global c
-    if c == 30 // speedmap[position] and speedmap[position] > 1:
+    if c == 30 // speedmap[position]:
         c = 0
         position += 1
-    elif speedmap[position] < 1:
-        if c == 30 * speedmap[position]:
-            c = 0
-            position += 1
 
 
 tile_images = {
@@ -525,13 +519,13 @@ while running:
                         movev.append(already[j][1] - already[j + 1][1])
                         point = already[j][0], already[j][1]
                         if maps[point[1]][point[0]] == 9:
-                            speedmap.append(2)
+                            speedmap.append(3)
                         elif maps[point[1]][point[0]] == 1:
-                            speedmap.append(0.5)
-                        elif maps[point[1]][point[0]] == 3:
-                            speedmap.append(0.5)
-                        else:
                             speedmap.append(1)
+                        elif maps[point[1]][point[0]] == 3:
+                            speedmap.append(1)
+                        else:
+                            speedmap.append(2)
 
                 work = True
 
@@ -615,6 +609,7 @@ while running:
                 Swordicon.activate()
                 Axeicon.back()
                 Bowicon.back()
+
     try:
         if pygame.mouse.get_pressed()[0] and (event.pos[0] > 300 and event.pos[1] < 900):
             if ((event.pos[0] - 300) // 30, event.pos[1] // 30) not in already:
@@ -648,5 +643,5 @@ while running:
         pygame.draw.rect(screen, (255, 255, 0), (j[0] * 30 + 300, j[1] * 30, 30, 30), 1)
 
     pygame.display.flip()
-clock.tick(60)
+clock.tick(30)
 terminate()

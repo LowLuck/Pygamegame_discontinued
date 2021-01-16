@@ -1,7 +1,6 @@
 import pygame
 import sys
 import os
-import pprint
 
 WIDTH = 1200
 HEIGHT = 1000
@@ -42,9 +41,6 @@ def load_level(filename):
 def terminate():
     pygame.quit()
     sys.exit()
-
-
-maps = []
 
 
 def generate_level(level):
@@ -140,43 +136,6 @@ def generate_level(level):
             maps.append(temp)
             temp = []
     return x, y
-
-
-tile_images = {
-    'wall': pygame.transform.scale(load_image('mgrass.png'), (30, 30)),
-    'empty': pygame.transform.scale(load_image('grass.png'), (30, 30)),
-    'road': pygame.transform.scale(load_image('road.png'), (30, 30)),
-    'lbroad': pygame.transform.scale(load_image('lbroad.png'), (30, 30)),
-    'rbroad': pygame.transform.scale(load_image('rbroad.png'), (30, 30)),
-    'luroad': pygame.transform.scale(load_image('luroad.png'), (30, 30)),
-    'ruroad': pygame.transform.scale(load_image('ruroad.png'), (30, 30)),
-    'tree': pygame.transform.scale(load_image('tgrass.png'), (30, 30)),
-    'groad': pygame.transform.scale(load_image('groad.png'), (30, 30)),
-    'troad': pygame.transform.scale(load_image('troad.png'), (30, 30)),
-    'rtroad': pygame.transform.scale(load_image('rtroad.png'), (30, 30)),
-    'retroad': pygame.transform.scale(load_image('retroad.png'), (30, 30)),
-    'croad': pygame.transform.scale(load_image('croad.png'), (30, 30)),
-    'ltroad': pygame.transform.scale(load_image('ltroad.png'), (30, 30)),
-
-    'griver': pygame.transform.scale(load_image('griver.png'), (30, 30)),
-    'river': pygame.transform.scale(load_image('river.png'), (30, 30)),
-    'lbriver': pygame.transform.scale(load_image('lbriver.png'), (30, 30)),
-    'rbriver': pygame.transform.scale(load_image('rbriver.png'), (30, 30)),
-    'luriver': pygame.transform.scale(load_image('luriver.png'), (30, 30)),
-    'ruriver': pygame.transform.scale(load_image('ruriver.png'), (30, 30)),
-    'griverb': pygame.transform.scale(load_image('griverb.png'), (30, 30)),
-    'riverb': pygame.transform.scale(load_image('riverb.png'), (30, 30)),
-    'smalltown': pygame.transform.scale(load_image('smalltown.png'), (30, 30)),
-    'smalltowna': pygame.transform.scale(load_image('smalltowna.png'), (30, 30)),
-    'smalltownb': pygame.transform.scale(load_image('smalltownb.png'), (30, 30)),
-    'bigtown': pygame.transform.scale(load_image('castle.png'), (30, 30)),
-    'coin': pygame.transform.scale(load_image('coin.png'), (30, 30)),
-    'coina': pygame.transform.scale(load_image('coina.png'), (30, 30)),
-    'coinb': pygame.transform.scale(load_image('coinb.png'), (30, 30)),
-
-}
-
-tile_width = tile_height = 30
 
 
 class Swordico(pygame.sprite.Sprite):
@@ -320,6 +279,13 @@ class Bows(pygame.sprite.Sprite):
         return (self.rect[0] - 300) // 30, self.rect[1] // 30
 
 
+class Deactivation(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(design_group, all_sprites)
+        self.image = load_image('Deactivation.png')
+        self.rect = self.image.get_rect().move(0, 600)
+
+
 class Units(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(design_group, all_sprites)
@@ -352,9 +318,80 @@ class Icons(pygame.sprite.Sprite):
         self.base = True
         self.redraw()
 
-    def reheal(self, into):
+    def heal(self, into):
         self.multi += into
 
+    def get_type(self):
+        return self.typer
+
+
+def moving(ico, diction):
+    global c
+    if moveg[position] != 0:
+        if moveg[position] == 1:
+            diction.get(ico.get_type()).update('left', speedmap[position])
+            c += 1
+        elif moveg[position] == -1:
+            diction.get(ico.get_type()).update('right', speedmap[position])
+            c += 1
+
+    if movev[position] != 0:
+        if movev[position] == 1:
+            diction.get(ico.get_type()).update('up', speedmap[position])
+            c += 1
+        elif movev[position] == -1:
+            diction.get(ico.get_type()).update('down', speedmap[position])
+            c += 1
+
+
+def check():
+    global speedmap
+    global position
+    global c
+    if c == 30 // speedmap[position] and speedmap[position] > 1:
+        c = 0
+        position += 1
+    elif speedmap[position] < 1:
+        if c == 30 * speedmap[position]:
+            c = 0
+            position += 1
+
+
+tile_images = {
+    'wall': pygame.transform.scale(load_image('mgrass.png'), (30, 30)),
+    'empty': pygame.transform.scale(load_image('grass.png'), (30, 30)),
+    'road': pygame.transform.scale(load_image('road.png'), (30, 30)),
+    'lbroad': pygame.transform.scale(load_image('lbroad.png'), (30, 30)),
+    'rbroad': pygame.transform.scale(load_image('rbroad.png'), (30, 30)),
+    'luroad': pygame.transform.scale(load_image('luroad.png'), (30, 30)),
+    'ruroad': pygame.transform.scale(load_image('ruroad.png'), (30, 30)),
+    'tree': pygame.transform.scale(load_image('tgrass.png'), (30, 30)),
+    'groad': pygame.transform.scale(load_image('groad.png'), (30, 30)),
+    'troad': pygame.transform.scale(load_image('troad.png'), (30, 30)),
+    'rtroad': pygame.transform.scale(load_image('rtroad.png'), (30, 30)),
+    'retroad': pygame.transform.scale(load_image('retroad.png'), (30, 30)),
+    'croad': pygame.transform.scale(load_image('croad.png'), (30, 30)),
+    'ltroad': pygame.transform.scale(load_image('ltroad.png'), (30, 30)),
+
+    'griver': pygame.transform.scale(load_image('griver.png'), (30, 30)),
+    'river': pygame.transform.scale(load_image('river.png'), (30, 30)),
+    'lbriver': pygame.transform.scale(load_image('lbriver.png'), (30, 30)),
+    'rbriver': pygame.transform.scale(load_image('rbriver.png'), (30, 30)),
+    'luriver': pygame.transform.scale(load_image('luriver.png'), (30, 30)),
+    'ruriver': pygame.transform.scale(load_image('ruriver.png'), (30, 30)),
+    'griverb': pygame.transform.scale(load_image('griverb.png'), (30, 30)),
+    'riverb': pygame.transform.scale(load_image('riverb.png'), (30, 30)),
+    'smalltown': pygame.transform.scale(load_image('smalltown.png'), (30, 30)),
+    'smalltowna': pygame.transform.scale(load_image('smalltowna.png'), (30, 30)),
+    'smalltownb': pygame.transform.scale(load_image('smalltownb.png'), (30, 30)),
+    'bigtown': pygame.transform.scale(load_image('castle.png'), (30, 30)),
+    'coin': pygame.transform.scale(load_image('coin.png'), (30, 30)),
+    'coina': pygame.transform.scale(load_image('coina.png'), (30, 30)),
+    'coinb': pygame.transform.scale(load_image('coinb.png'), (30, 30)),
+
+}
+maps = []
+tile_width = tile_height = 30
 
 design_group = pygame.sprite.Group()
 war_group = pygame.sprite.Group()
@@ -362,17 +399,14 @@ end_group = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 level_x, level_y = generate_level(load_level('map.txt'))
 
-warmap = [[0 for j in range(30)] for i in range(30)]
-# 1 - мечники
-
 clock = pygame.time.Clock()
+
 running = True
+work = False
 c = -1
-name = 0
-promove = []
 already = []
 allow = -1
-work = False
+
 position = 0
 point = ()
 spawnmode = 0
@@ -381,12 +415,11 @@ moveg = []
 movev = []
 speedmap = []
 Units()
+Deactivation()
 Swordicon = Swordico()
 Axeicon = Axeico()
 Bowicon = Bowico()
 
-qr = pprint.PrettyPrinter(width=41, compact=True)
-qr.pprint(maps)
 Sword0 = None
 Sword1 = None
 Sword2 = None
@@ -404,6 +437,11 @@ Bow1 = None
 Bow2 = None
 Bow3 = None
 Bow4 = None
+dict0 = {'Swords': Sword0, 'Axes': Axe0, 'Bows': Bow0}
+dict1 = {'Swords': Sword1, 'Axes': Axe1, 'Bows': Bow1}
+dict2 = {'Swords': Sword2, 'Axes': Axe2, 'Bows': Bow2}
+dict3 = {'Swords': Sword3, 'Axes': Axe3, 'Bows': Bow3}
+dict4 = {'Swords': Sword4, 'Axes': Axe4, 'Bows': Bow4}
 while running:
     all_sprites.draw(screen)
     tiles_group.draw(screen)
@@ -465,6 +503,12 @@ while running:
                         Bow0 = Bows()
                         icon0 = Icons(1, 'Bows')
 
+                dict0 = {'Swords': Sword0, 'Axes': Axe0, 'Bows': Bow0}
+                dict1 = {'Swords': Sword1, 'Axes': Axe1, 'Bows': Bow1}
+                dict2 = {'Swords': Sword2, 'Axes': Axe2, 'Bows': Bow2}
+                dict3 = {'Swords': Sword3, 'Axes': Axe3, 'Bows': Bow3}
+                dict4 = {'Swords': Sword4, 'Axes': Axe4, 'Bows': Bow4}
+
             elif event.key == pygame.K_l:
                 already = []
                 movev = []
@@ -480,7 +524,6 @@ while running:
                         moveg.append(already[j][0] - already[j + 1][0])
                         movev.append(already[j][1] - already[j + 1][1])
                         point = already[j][0], already[j][1]
-                        print(maps[point[1]][point[0]])
                         if maps[point[1]][point[0]] == 9:
                             speedmap.append(2)
                         elif maps[point[1]][point[0]] == 1:
@@ -493,7 +536,7 @@ while running:
                 work = True
 
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if (100 < event.pos[1] < 199) and event.pos[0] < 200 and len(promove) >= 1:
+            if (100 < event.pos[1] < 199) and event.pos[0] < 200:
                 try:
                     icon0.change()
                     icon1.back()
@@ -504,7 +547,7 @@ while running:
                     pass
                 allow = 0
 
-            elif (200 < event.pos[1] < 299) and event.pos[0] < 200 and len(promove) >= 2:
+            elif (200 < event.pos[1] < 299) and event.pos[0] < 200:
                 try:
                     icon1.change()
                     icon0.back()
@@ -515,7 +558,7 @@ while running:
                     pass
                 allow = 1
 
-            elif (300 < event.pos[1] < 399) and event.pos[0] < 200 and len(promove) >= 3:
+            elif (300 < event.pos[1] < 399) and event.pos[0] < 200:
                 try:
                     icon2.change()
                     icon0.back()
@@ -526,7 +569,7 @@ while running:
                     pass
                 allow = 2
 
-            elif (400 < event.pos[1] < 499) and event.pos[0] < 200 and len(promove) >= 4:
+            elif (400 < event.pos[1] < 499) and event.pos[0] < 200:
                 try:
                     icon3.change()
                     icon0.back()
@@ -536,8 +579,7 @@ while running:
                 except NameError:
                     pass
                 allow = 3
-
-            elif (500 < event.pos[1] < 599) and event.pos[0] < 200 and len(promove) >= 5:
+            elif (500 < event.pos[1] < 599) and event.pos[0] < 200:
                 try:
                     icon4.change()
                     icon0.back()
@@ -547,7 +589,7 @@ while running:
                 except NameError:
                     pass
                 allow = 4
-            elif event.pos[1] > 599 and event.pos[0] < 200:
+            elif 599 < event.pos[1] < 699 and event.pos[0] < 200:
                 try:
                     allow = -1
                     icon0.back()
@@ -557,6 +599,7 @@ while running:
                     icon4.back()
                 except NameError:
                     pass
+
             elif event.pos[1] > 900 and event.pos[0] > 500:
                 spawnmode = 2
                 Bowicon.activate()
@@ -576,37 +619,34 @@ while running:
         if pygame.mouse.get_pressed()[0] and (event.pos[0] > 300 and event.pos[1] < 900):
             if ((event.pos[0] - 300) // 30, event.pos[1] // 30) not in already:
                 already.append(((event.pos[0] - 300) // 30, event.pos[1] // 30))
-    except AttributeError:
+    except Exception:
         pass
     try:
         if work:
             if allow == 0:
-                if moveg[position] != 0:
-                    if moveg[position] == 1:
-                        Sword0.update('left', speedmap[position])
-                        c += 1
-                    elif moveg[position] == -1:
-                        Sword0.update('right', speedmap[position])
-                        c += 1
+                moving(icon0, dict0)
+                check()
+            if allow == 1:
+                moving(icon1, dict1)
+                check()
 
-                if movev[position] != 0:
-                    if movev[position] == 1:
-                        Sword0.update('up', speedmap[position])
-                        c += 1
-                    elif movev[position] == -1:
-                        Sword0.update('down', speedmap[position])
-                        c += 1
-                if c == 30 // speedmap[position]:
-                    c = 0
-                    position += 1
+            if allow == 2:
+                moving(icon2, dict2)
+                check()
 
-    except ValueError:
-        print('An error')
+            if allow == 3:
+                moving(icon3, dict3)
+                check()
+
+            if allow == 4:
+                moving(icon4, dict4)
+                check()
     except IndexError:
         pass
+
     for j in already:
         pygame.draw.rect(screen, (255, 255, 0), (j[0] * 30 + 300, j[1] * 30, 30, 30), 1)
 
     pygame.display.flip()
 clock.tick(60)
-pygame.quit()
+terminate()

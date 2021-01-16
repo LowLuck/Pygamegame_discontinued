@@ -179,6 +179,78 @@ tile_images = {
 tile_width = tile_height = 30
 
 
+class Swordico(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(design_group, all_sprites)
+        self.base = True
+        self.images = ['Sword100.png', 'Sword100act.png']
+        self.image = load_image(self.images[0])
+        self.rect = self.image.get_rect().move(300, 900)
+
+    def redraw(self):
+        if self.base:
+            self.image = load_image(self.images[0])
+        else:
+            self.image = load_image(self.images[1])
+        self.base = not self.base
+
+    def back(self):
+        self.base = True
+        self.redraw()
+
+    def activate(self):
+        self.base = False
+        self.redraw()
+
+
+class Axeico(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(design_group, all_sprites)
+        self.base = True
+        self.images = ['Axe100.png', 'Axe100act.png']
+        self.image = load_image(self.images[0])
+        self.rect = self.image.get_rect().move(400, 900)
+
+    def redraw(self):
+        if self.base:
+            self.image = load_image(self.images[0])
+        else:
+            self.image = load_image(self.images[1])
+        self.base = not self.base
+
+    def back(self):
+        self.base = True
+        self.redraw()
+
+    def activate(self):
+        self.base = False
+        self.redraw()
+
+
+class Bowico(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(design_group, all_sprites)
+        self.base = True
+        self.images = ['Bow100.png', 'Bow100act.png']
+        self.image = load_image(self.images[0])
+        self.rect = self.image.get_rect().move(500, 900)
+
+    def redraw(self):
+        if self.base:
+            self.image = load_image(self.images[0])
+        else:
+            self.image = load_image(self.images[1])
+        self.base = not self.base
+
+    def back(self):
+        self.base = True
+        self.redraw()
+
+    def activate(self):
+        self.base = False
+        self.redraw()
+
+
 class Tile(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
         move = 300
@@ -208,6 +280,46 @@ class Swords(pygame.sprite.Sprite):
         return (self.rect[0] - 300) // 30, self.rect[1] // 30
 
 
+class Axes(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(war_group)
+        self.image = load_image('Axebig.png')
+        self.rect = self.image.get_rect().move(30 * 27 + 290, 30 * 28 - 10)
+
+    def update(self, move, speed):
+        if move == 'left':
+            self.rect[0] -= speed
+        elif move == 'up':
+            self.rect[1] -= speed
+        elif move == 'right':
+            self.rect[0] += speed
+        elif move == 'down':
+            self.rect[1] += speed
+
+    def getrect(self):
+        return (self.rect[0] - 300) // 30, self.rect[1] // 30
+
+
+class Bows(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(war_group)
+        self.image = load_image('Bowbig.png')
+        self.rect = self.image.get_rect().move(30 * 27 + 290, 30 * 28 - 10)
+
+    def update(self, move, speed):
+        if move == 'left':
+            self.rect[0] -= speed
+        elif move == 'up':
+            self.rect[1] -= speed
+        elif move == 'right':
+            self.rect[0] += speed
+        elif move == 'down':
+            self.rect[1] += speed
+
+    def getrect(self):
+        return (self.rect[0] - 300) // 30, self.rect[1] // 30
+
+
 class Units(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(design_group, all_sprites)
@@ -216,10 +328,11 @@ class Units(pygame.sprite.Sprite):
 
 
 class Icons(pygame.sprite.Sprite):
-    def __init__(self, number):
+    def __init__(self, number, typek):
         super().__init__(design_group, all_sprites)
         self.base = True
         self.n = number
+        self.typer = typek
         self.redraw()
         self.rect = self.image.get_rect().move(0, 100 * number)
         self.multi = 100
@@ -227,9 +340,9 @@ class Icons(pygame.sprite.Sprite):
 
     def redraw(self):
         if self.base:
-            self.image = load_image('Swords' + str(self.n) + '.png')
+            self.image = load_image(str(self.typer) + str(self.n) + '.png')
         else:
-            self.image = load_image('Swords' + str(self.n) + 'active.png')
+            self.image = load_image(str(self.typer) + str(self.n) + 'active.png')
 
     def change(self):
         self.base = not self.base
@@ -262,14 +375,37 @@ allow = -1
 work = False
 position = 0
 point = ()
+spawnmode = 0
 
 moveg = []
 movev = []
 speedmap = []
 Units()
+Swordicon = Swordico()
+Axeicon = Axeico()
+Bowicon = Bowico()
+
 qr = pprint.PrettyPrinter(width=41, compact=True)
 qr.pprint(maps)
+Sword0 = None
+Sword1 = None
+Sword2 = None
+Sword3 = None
+Sword4 = None
+
+Axe0 = None
+Axe1 = None
+Axe2 = None
+Axe3 = None
+Axe4 = None
+
+Bow0 = None
+Bow1 = None
+Bow2 = None
+Bow3 = None
+Bow4 = None
 while running:
+    all_sprites.draw(screen)
     tiles_group.draw(screen)
     war_group.draw(screen)
     design_group.draw(screen)
@@ -277,32 +413,57 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_x:
-                if name == 0:
-                    Sword0 = Swords()
-                    name += 1
-                    icon0 = Icons(1)
-                    promove.append(0)
-                elif name == 1:
-                    Sword1 = Swords()
-                    name += 1
-                    icon1 = Icons(2)
-                    promove.append(0)
-                elif name == 2:
-                    Sword2 = Swords()
-                    name += 1
-                    icon2 = Icons(3)
-                    promove.append(0)
-                elif name == 3:
-                    Sword3 = Swords()
-                    name += 1
-                    icon3 = Icons(4)
-                    promove.append(0)
-                elif name == 4:
-                    Sword4 = Swords()
-                    name += 1
-                    icon4 = Icons(5)
-                    promove.append(0)
+            if event.key == pygame.K_z:
+                if spawnmode == 0:
+                    if Sword3 or Axe3 or Bow3:
+                        Sword4 = Swords()
+                        icon4 = Icons(5, 'Swords')
+                    elif Sword2 or Axe2 and not Axe3 and not Bow3 or Bow2 and not Bow3 and not Axe3:
+                        Sword3 = Swords()
+                        icon3 = Icons(4, 'Swords')
+                    elif Sword1 or Axe1 and not Axe2 and not Bow2 or Bow1 and not Bow2 and not Axe2:
+                        Sword2 = Swords()
+                        icon2 = Icons(3, 'Swords')
+                    elif Sword0 or Axe0 and not Axe1 and not Bow1 or Bow0 and not Bow1 and not Axe1:
+                        Sword1 = Swords()
+                        icon1 = Icons(2, 'Swords')
+                    elif not Axe0 and not Bow0:
+                        Sword0 = Swords()
+                        icon0 = Icons(1, 'Swords')
+
+                elif spawnmode == 1:
+                    if Axe3 or Sword3 or Bow3:
+                        Axe4 = Axes()
+                        icon4 = Icons(5, 'Axes')
+                    elif Axe2 or Sword2 and not Sword3 and not Bow3 or Bow2 and not Bow3 and not Sword3:
+                        Axe3 = Axes()
+                        icon3 = Icons(4, 'Axes')
+                    elif Axe1 or Sword1 and not Sword2 and not Bow2 or Bow1 and not Bow2 and not Sword2:
+                        Axe2 = Axes()
+                        icon2 = Icons(3, 'Axes')
+                    elif Axe0 or Sword0 and not Sword1 and not Bow1 or Bow0 and not Bow1 and not Sword1:
+                        Axe1 = Axes()
+                        icon1 = Icons(2, 'Axes')
+                    elif not Sword0 and not Bow0:
+                        Axe0 = Axes()
+                        icon0 = Icons(1, 'Axes')
+
+                elif spawnmode == 2:
+                    if Bow3 or Sword3 or Axe3:
+                        Bow4 = Bows()
+                        icon4 = Icons(5, 'Bows')
+                    elif Bow2 or Sword2 and not Sword3 and not Axe3 or Axe2 and not Axe3 and not Sword3:
+                        Bow3 = Bows()
+                        icon3 = Icons(4, 'Bows')
+                    elif Bow1 or Sword1 and not Sword2 and not Axe2 or Axe1 and not Axe2 and not Sword2:
+                        Bow2 = Bows()
+                        icon2 = Icons(3, 'Bows')
+                    elif Bow0 or Sword0 and not Sword1 and not Axe1 or Axe0 and not Axe1 and not Sword1:
+                        Bow1 = Bows()
+                        icon1 = Icons(2, 'Bows')
+                    elif not Sword0 and not Axe0:
+                        Bow0 = Bows()
+                        icon0 = Icons(1, 'Bows')
 
             elif event.key == pygame.K_l:
                 already = []
@@ -396,6 +557,21 @@ while running:
                     icon4.back()
                 except NameError:
                     pass
+            elif event.pos[1] > 900 and event.pos[0] > 500:
+                spawnmode = 2
+                Bowicon.activate()
+                Axeicon.back()
+                Swordicon.back()
+            elif event.pos[1] > 900 and event.pos[0] > 400:
+                spawnmode = 1
+                Axeicon.activate()
+                Bowicon.back()
+                Swordicon.back()
+            elif event.pos[1] > 900 and event.pos[0] > 300:
+                spawnmode = 0
+                Swordicon.activate()
+                Axeicon.back()
+                Bowicon.back()
     try:
         if pygame.mouse.get_pressed()[0] and (event.pos[0] > 300 and event.pos[1] < 900):
             if ((event.pos[0] - 300) // 30, event.pos[1] // 30) not in already:
